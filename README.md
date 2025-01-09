@@ -40,7 +40,7 @@ sudo bash set_fix_ip.sh
 
 1. Clone this repository to your Raspberry Pi:
 ```bash
-git clone https://github.com/yourusername/RPi_FastSetup.git
+git clone https://github.com/DvidMakesThings/RPi_FastSetup.git
 cd RPi_FastSetup
 ```
 
