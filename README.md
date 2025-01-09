@@ -40,21 +40,26 @@ sudo bash set_fix_ip.sh
 
 1. Clone this repository to your Raspberry Pi:
 ```bash
-git clone https://github.com/yourusername/RPI_OLED.git
-cd RPI_OLED
+git clone https://github.com/yourusername/RPi_FastSetup.git
+cd RPi_FastSetup
 ```
 
-2. Run the `sys_setup.sh` script to set up the system and OLED display:
+2. Make the scripts executable:
+```bash
+chmod +x sys_setup.sh set_fix_ip.sh
+```
+
+3. Run the `sys_setup.sh` script to set up the system and OLED display:
 ```bash
 sudo bash sys_setup.sh
 ```
 
-3. Run the `set_fix_ip.sh` script to configure a static IP address for the Ethernet interface:
+4. Run the `set_fix_ip.sh` script to configure a static IP address for the Ethernet interface:
 ```bash
 sudo bash set_fix_ip.sh
 ```
 
-4. Verify that the OLED display service is running:
+5. Verify that the OLED display service is running:
 ```bash
 sudo systemctl status oled_display.service
 ```
