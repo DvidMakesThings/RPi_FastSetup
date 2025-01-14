@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ 
 # Function to check and install dhcpcd
 check_and_install_dhcpcd() {
     echo "Checking if dhcpcd is installed..."

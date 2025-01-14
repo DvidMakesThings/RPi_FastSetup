@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ 
 # Function to update the system
 update_system() {
     sudo apt update

@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ 
 # Update and upgrade system
 echo "Updating and upgrading system..."
 sudo apt update && sudo apt full-upgrade -y
