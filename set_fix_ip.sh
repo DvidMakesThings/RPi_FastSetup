@@ -15,46 +15,49 @@ check_and_install_dhcpcd() {
     fi
 }
 
-# Function to set a static IP for eth0
-set_static_ip_eth0() {
-    local ip_base="192.168.0."
-
-    echo "Enter the full IP for eth0: ${ip_base}[last octet]"
-    read -p "Last octet (e.g., 10): " last_octet
-
-    # Validate last octet
-    if ! [[ "$last_octet" =~ ^[0-9]+$ ]] || [ "$last_octet" -lt 1 ] || [ "$last_octet" -gt 254 ]; then
-        echo "Invalid last octet. Please enter a number between 1 and 254."
-        exit 1
-    fi
-
-    # Full IP address
-    ip_address="${ip_base}${last_octet}/24"
-
-    # Add to dhcpcd.conf
-    echo "Configuring static IP for eth0..."
-    sudo bash -c "cat > /etc/dhcpcd.conf <<EOF
-interface eth0
-static ip_address=$ip_address
-static routers=${ip_base}1
-static domain_name_servers=8.8.8.8
-nohook dhcp
-EOF"
-
-    echo "Static IP for eth0 set to $ip_address"
-}
-
-# Start script
-echo "Setting up static IP for eth0..."
-
 # Check and install dhcpcd if necessary
 check_and_install_dhcpcd
 
-# Configure Ethernet (eth0)
-set_static_ip_eth0
+# Retrieve the router IP address
+router_ip=$(ip r | grep default | awk '{print $3}')
+echo "Router IP: $router_ip"
 
-# Restart networking
-echo "Restarting networking service..."
-sudo systemctl restart dhcpcd
+# Retrieve the current DNS server IP address
+dns_ip=$(grep "nameserver" /etc/resolv.conf | awk '{print $2}')
+echo "DNS Server IP: $dns_ip"
 
-echo "Static IP configuration complete!"
+# Prompt user for static IP address for eth0
+read -p "Enter the static IP address you want to assign to eth0: " eth0_ip
+
+# Calculate the static IP address for wlan0 (eth0 + 5)
+IFS='.' read -r -a ip_array <<< "$eth0_ip"
+wlan0_ip="${ip_array[0]}.${ip_array[1]}.${ip_array[2]}.$((ip_array[3] + 5))"
+echo "Calculated static IP address for wlan0: $wlan0_ip"
+
+# Backup the current dhcpcd.conf file
+sudo cp /etc/dhcpcd.conf /etc/dhcpcd.conf.bak
+
+# Add static IP configuration for eth0 to dhcpcd.conf
+echo "interface eth0" | sudo tee -a /etc/dhcpcd.conf
+echo "static ip_address=$eth0_ip/24" | sudo tee -a /etc/dhcpcd.conf
+echo "static routers=$router_ip" | sudo tee -a /etc/dhcpcd.conf
+echo "static domain_name_servers=$dns_ip" | sudo tee -a /etc/dhcpcd.conf
+
+# Add static IP configuration for wlan0 to dhcpcd.conf
+echo "interface wlan0" | sudo tee -a /etc/dhcpcd.conf
+echo "static ip_address=$wlan0_ip/24" | sudo tee -a /etc/dhcpcd.conf
+echo "static routers=$router_ip" | sudo tee -a /etc/dhcpcd.conf
+echo "static domain_name_servers=$dns_ip" | sudo tee -a /etc/dhcpcd.conf
+
+# Restart the Raspberry Pi to apply changes
+echo "Rebooting to apply changes..."
+sudo reboot
+
+# Wait for the system to reboot
+sleep 60
+
+# Verify the static IP addresses
+echo "Verifying the static IP addresses..."
+hostname -I
+
+echo "Static IP setup complete."
