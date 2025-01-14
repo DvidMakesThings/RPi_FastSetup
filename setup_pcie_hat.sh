@@ -1,17 +1,51 @@
 #!/bin/bash
 
-# Enable PCIe Interface
-echo "Enabling PCIe Interface..."
-if ! grep -q "dtparam=pciex1" /boot/firmware/config.txt; then
-    echo "dtparam=pciex1" | sudo tee -a /boot/firmware/config.txt
+# Function to display help message
+display_help() {
+    echo "Usage: $0 [options]"
+    echo
+    echo "Options:"
+    echo "  --setup_pciehat       Enable PCIe Interface"
+    echo "  --setup_pwr_monitor   Set up NVME Power Monitoring"
+    echo "  --help                Display this help message"
+    echo
+}
+
+# Function to enable PCIe Interface
+enable_pcie_interface() {
+    echo "Enabling PCIe Interface..."
+    if ! grep -q "dtparam=pciex1" /boot/firmware/config.txt; then
+        echo "dtparam=pciex1" | sudo tee -a /boot/firmware/config.txt
+    fi
+    echo "PCIe Interface enabled. The system will now reboot."
+    sudo reboot
+}
+
+# Function to set up NVME Power Monitoring
+setup_pwr_monitor() {
+    echo "Setting up NVME Power Monitoring..."
+    wget https://files.waveshare.com/upload/0/06/PCIE_HAT_INA219.zip
+    unzip -o PCIE_HAT_INA219.zip -d ./PCIE_HAT_INA219
+    cd PCIE_HAT_INA219
+    sudo python INA219.py
+    echo "NVME Power Monitoring setup complete."
+}
+
+# Main script
+if [[ "$1" == "--help" ]]; then
+    display_help
+    exit 0
 fi
 
-# Reboot to apply changes
-echo "Rebooting to apply changes..."
-sudo reboot
+# Enable PCIe Interface if --setup_pciehat is provided
+if [[ "$1" == "--setup_pciehat" ]]; then
+    enable_pcie_interface
+fi
 
-# Wait for the system to reboot
-sleep 60
+# Set up NVME Power Monitoring if --setup_pwr_monitor is provided
+if [[ "$1" == "--setup_pwr_monitor" ]]; then
+    setup_pwr_monitor
+fi
 
 # Check if the SSD is recognized
 echo "Checking if the SSD is recognized..."
@@ -70,12 +104,5 @@ sleep 60
 # Check the device through lsblk
 echo "Checking the device through lsblk..."
 lsblk
-
-# NVME Power Monitoring setup
-echo "Setting up NVME Power Monitoring..."
-wget https://files.waveshare.com/upload/0/06/PCIE_HAT_INA219.zip
-unzip -o PCIE_HAT_INA219.zip -d ./PCIE_HAT_INA219
-cd PCIE_HAT_INA219
-sudo python INA219.py
 
 echo "Installation and setup complete."
