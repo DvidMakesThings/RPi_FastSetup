@@ -19,7 +19,11 @@ set_pcie_gen3() {
 # Function to install Hailo software
 install_hailo_software() {
     sudo apt install -y hailo-all
-    sudo reboot
+    mkdir -p /home/GitHub_ext
+    git clone https://github.com/hailo-ai/hailo-rpi5-examples.git /home/GitHub_ext/hailo-rpi5-examples
+    cd /home/GitHub_ext/hailo-rpi5-examples
+    sudo chmod +x install.sh
+    sudo ./install.sh
 }
 
 # Function to verify installation
@@ -38,12 +42,13 @@ upgrade_hailo() {
     sudo apt update
     sudo apt full-upgrade -y
     sudo apt install -y hailo-all
-    sudo reboot
+    
 }
 
 # Function to update GitHub repository
 update_github_repo() {
-    cd [your-path]/hailo-rpi5-examples
+    mkdir /home/masterpi/_GitHub/external
+    cd /home/masterpi/_GitHub/external
     git pull
 }
 
