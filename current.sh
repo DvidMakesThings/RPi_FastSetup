@@ -10,7 +10,7 @@ sudo rpi-eeprom-config --out /tmp/boot.conf --config /proc/device-tree/hat/custo
 echo "PSU_MAX_CURRENT=5000" | sudo tee -a /tmp/boot.conf
 sudo rpi-eeprom-config --apply /tmp/boot.conf
 
-echo "Setup complete. The OLED display script and required interfaces are now enabled!"
+echo "Setup complete"
 
 # Countdown timer in the background
 (
