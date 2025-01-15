@@ -1,5 +1,5 @@
 #!/bin/bash
- 
+
 # Function to check and install dhcpcd
 check_and_install_dhcpcd() {
     echo "Checking if dhcpcd is installed..."
@@ -77,6 +77,14 @@ echo "interface wlan0" | sudo tee -a /etc/dhcpcd.conf
 echo "static ip_address=$wlan0_ip/24" | sudo tee -a /etc/dhcpcd.conf
 echo "static routers=$router_ip" | sudo tee -a /etc/dhcpcd.conf
 echo "static domain_name_servers=$dns_ip" | sudo tee -a /etc/dhcpcd.conf
+
+# Clear old DHCP leases
+echo "Clearing old DHCP leases..."
+sudo rm -f /var/lib/dhcpcd5/*
+
+# Restart dhcpcd to apply changes
+echo "Restarting dhcpcd service..."
+sudo systemctl restart dhcpcd
 
 # Set up port forwarding
 setup_port_forwarding
