@@ -107,14 +107,8 @@ echo "Enabling 1-Wire..."
 sudo raspi-config nonint do_onewire 0
 
 # Modify /boot/firmware/config.txt to allow max current
-echo "Modifying /boot/firmware/config.txt to allow max current..."
-sudo bash -c "echo 'usb_max_current_enable=1' >> /boot/firmware/config.txt"
-
-# Modify EEPROM to allow max current
-echo "Modifying EEPROM to allow max current..."
-sudo -E rpi-eeprom-config --edit <<EOF
-PSU_MAX_CURRENT=5000
-EOF
+echo "Calling powerscript.sh to modify settings to allow max current..."
+./powerscript.sh --maxcurrent
 
 echo "Setup complete. The OLED display script and required interfaces are now enabled!"
 
