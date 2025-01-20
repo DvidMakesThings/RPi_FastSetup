@@ -15,24 +15,6 @@ check_and_install_dhcpcd() {
     fi
 }
 
-# Function to set up port forwarding
-setup_port_forwarding() {
-    read -p "Enter the external port for SSH (e.g., 2222): " external_port
-    internal_ip=$(hostname -I | awk '{print $1}')
-    echo "Please configure your router to forward port $external_port to $internal_ip:22"
-    read -p "Press [Enter] to continue once you have completed the port forwarding configuration..."
-}
-
-# Function to set up Remote Desktop
-setup_remote_desktop() {
-    echo "Setting up Remote Desktop..."
-    sudo apt update
-    sudo apt install -y xrdp
-    sudo systemctl enable xrdp
-    sudo systemctl start xrdp
-    echo "Remote Desktop (xrdp) installed and started. You can now connect using an RDP client."
-}
-
 # Check and install dhcpcd if necessary
 check_and_install_dhcpcd
 
@@ -64,14 +46,4 @@ sudo rm -f /var/lib/dhcpcd5/*
 echo "Restarting dhcpcd service..."
 sudo systemctl restart dhcpcd
 
-# Set up port forwarding
-setup_port_forwarding
-
-# Set up Remote Desktop
-setup_remote_desktop
-
-read -p "Press [Enter] to reboot the Raspberry Pi and apply changes..."
-
-# Restart the Raspberry Pi to apply changes
-echo "Rebooting to apply changes..."
 sudo reboot now
