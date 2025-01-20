@@ -119,4 +119,12 @@ echo "Enabling and starting the OLED display service..."
 sudo systemctl enable oled_display.service
 sudo systemctl start oled_display.service
 
+# Create folders
+echo "########################## Create GitHub Folders ##############################"
+mkdir -p /home/$USER/_GitHub
+cd /home/$USER/_GitHub
+mkdir -p /home/$USER/_GitHub/External
+git clone https://github.com/DvidMakesThings/RPi_FastSetup.git
+cd
+
 sudo reboot now
