@@ -58,12 +58,18 @@ sudo apt update && sudo apt full-upgrade -y
 sudo apt update
 sudo apt upgrade -y
 
-# Install build tools and dependencies for Python
-echo "#################### Installing build tools and dependencies ####################"
-sudo apt install -y build-essential libssl-dev libffi-dev zlib1g-dev libsqlite3-dev libbz2-dev libreadline-dev libncurses5-dev libgdbm-dev libnss3-dev liblzma-dev uuid-dev wget
+# Update and install system dependencies
+echo "#################### Updating and Installing Required Packages ####################"
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y \
+    python3-dev python3-pip python3-numpy \
+    libfreetype6-dev libjpeg-dev build-essential \
+    libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev \
+    libssl-dev libffi-dev zlib1g-dev libsqlite3-dev libbz2-dev libreadline-dev libncurses5-dev \
+    libgdbm-dev libnss3-dev liblzma-dev uuid-dev wget git
 
 # Download and install Python 3.12.3
-echo "################### Downloading and installing Python 3.12.3 ####################"
+echo "################### Downloading and Installing Python 3.12.3 ####################"
 cd /usr/src
 sudo wget https://www.python.org/ftp/python/3.12.3/Python-3.12.3.tgz
 sudo tar xzf Python-3.12.3.tgz
@@ -87,8 +93,22 @@ cd /opt/luma
 git clone https://github.com/rm-hull/luma.examples.git
 cd luma.examples
 
-# Enable I2C interface
+# Enable the I2C interface
+echo "Enabling I2C interface..."
 sudo raspi-config nonint do_i2c 0
+
+# Create Python virtual environment
+echo "######################## Setting Up Virtual Environment ########################"
+VENV_DIR="/opt/sys_venv"
+sudo mkdir -p $VENV_DIR
+sudo chown $USER:$USER $VENV_DIR
+python3.12 -m venv $VENV_DIR
+source $VENV_DIR/bin/activate
+
+# Install Python dependencies inside the virtual environment
+echo "Installing Python dependencies in virtual environment..."
+pip install --upgrade pip
+pip install luma.oled luma.core
 
 # Create the systemd service file
 echo "Creating systemd service..."
@@ -100,24 +120,30 @@ Description=OLED Display Service
 After=multi-user.target
 
 [Service]
-ExecStart=/usr/bin/python3 /opt/luma/luma.examples/examples/sys_info_extended.py
+ExecStart=$VENV_DIR/bin/python3 /opt/luma/luma.examples/examples/sys_info_extended.py
 WorkingDirectory=/opt/luma/luma.examples/examples
 Restart=always
 User=$USER
 Group=$USER
+Environment=\"PYTHONUNBUFFERED=1\"
 
 [Install]
 WantedBy=multi-user.target
 EOF"
 
-# Reload systemd to recognize the new service
-echo "Reloading systemd..."
+# Reload systemd and enable the service
+echo "Reloading systemd and enabling the service..."
 sudo systemctl daemon-reload
-
-# Enable and start the service
-echo "Enabling and starting the OLED display service..."
 sudo systemctl enable oled_display.service
+
+# Start the OLED display service
+echo "Starting the OLED display service..."
 sudo systemctl start oled_display.service
+
+# Check the service status
+echo "Checking the service status..."
+sudo systemctl status oled_display.service
+
 
 # Create folders
 echo "########################## Create GitHub Folders ##############################"
