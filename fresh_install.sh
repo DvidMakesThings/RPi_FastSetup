@@ -125,6 +125,10 @@ mkdir -p /home/$USER/_GitHub
 cd /home/$USER/_GitHub
 mkdir -p /home/$USER/_GitHub/External
 git clone https://github.com/DvidMakesThings/RPi_FastSetup.git
+git clone https://github.com/DvidMakesThings/PiVortex.git
+cd /PiVortex
+chmod -x startslave.sh
+chmod -x startApp.sh
 cd
 
 sudo reboot now
